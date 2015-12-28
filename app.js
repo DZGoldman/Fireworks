@@ -114,7 +114,7 @@ function burst1(firework, num) {
     return createdSparks
 }
 
-var createdSparkies = [];
+
 
 function burst2(firework, num) {
   var SparkFactory = function (firework) {
@@ -153,7 +153,7 @@ function burst2(firework, num) {
     for (var i = 0; i < num; i++) {
       var miniSpark = miniSparkFactory(spark)
       createdMiniSparks.push(miniSpark);
-      var forceCoef= .0039;
+      var forceCoef= .001;
       var xForce =forceCoef*(Math.random()-.5)
       var yForce =forceCoef*(Math.random()-.5)
       Matter.Body.applyForce(miniSpark, {x:miniSpark.position.x,y:miniSpark.position.y}, {x:xForce, y:yForce})
@@ -164,36 +164,99 @@ function burst2(firework, num) {
     }
   };
 
+    var createdSparkies=[];
+    for (var i = 0; i < num; i++) {
+      var spark = SparkFactory(firework)
+      createdSparkies.push(spark);
+      var forceCoef= .003;
+      var xForce =forceCoef*(Math.random()-.5)
+      var yForce =-0.001+forceCoef*(Math.random()-1)
+      Matter.Body.applyForce(spark, {x:spark.position.x,y:spark.position.y}, {x:xForce, y:yForce})
+      World.add(world, spark);
+
+    }
+    Events.on(engine, "afterTick", function(event) {
+      createdSparkies.forEach(function (sparky) {
+        sparky.render.fillStyle = randomElement(colors)
+      })
+  })
+
+    window.setTimeout(function () {
+      createdSparkies.forEach(function (spark) {
+        burst21(spark, 20)
+        Matter.Composite.remove(world, spark);
+      })
+
+    },2200)
+}
+
+function burst3(firework, num) {
+  var SparkFactory = function (firework) {
+    return Bodies.circle(firework.position.x, firework.position.y, 5,
+      {  render: {strokeStyle: 'black',
+                  fillStyle: 'rgb(255, 255, 255)'
+                },
+          groupId:1,
+          mass: 0.047,
+          // gravity: {x:0, y:-.5},
+          timeScale: 0.4
+          // frictionAir: 0.02
+      },
+      1000
+    )
+  };
   var createdSparkies=[];
   for (var i = 0; i < num; i++) {
     var spark = SparkFactory(firework)
     createdSparkies.push(spark);
     var forceCoef= .003;
-    var xForce =forceCoef*(Math.random()-.5)
+    var xForce =2*forceCoef*(Math.random()-.5)
     var yForce =-0.001+forceCoef*(Math.random()-1)
     Matter.Body.applyForce(spark, {x:spark.position.x,y:spark.position.y}, {x:xForce, y:yForce})
     World.add(world, spark);
-
   }
-  Events.on(engine, "afterTick", function(event) {
-    createdSparkies.forEach(function (sparky) {
-      sparky.render.fillStyle = randomElement(colors)
-    })
-})
+
+
+  createdSparkies.forEach(function (spark) {
+
+
+  var ID = window.setInterval(function () {
+    var goldBall= Bodies.circle(spark.position.x, spark.position.y, 2.5,
+      {  render: {strokeStyle: 'black',
+                  fillStyle: 'rgb(236, 206, 4)'
+                },
+          groupId:1,
+          isStatic: true,
+      },
+      1000
+    );
+    World.add(world, goldBall);
+    window.setTimeout(function () {
+      Matter.Composite.remove(world, goldBall);
+
+    },4000) // goldball removal
+
+
+  }, 80); // end set interval/ goldball creation
+
+  window.setTimeout(function () {
+    window.clearInterval(ID)
+  }, 5000)
+}) // end for each
+
 
   window.setTimeout(function () {
     createdSparkies.forEach(function (spark) {
-      burst21(spark, 10)
       Matter.Composite.remove(world, spark);
     })
 
-  },2200)
+  },5000)
+
 }
 
 
-
 function makeRocket1 () {
-  var rocket1 = Bodies.polygon(width*.8*Math.random(), height, 3, 15,
+  var rocket1 = Bodies.polygon(width*0.1 + width*.8*Math.random(), height, 3, 15,
     { timeScale: 1,
       mass:0.047019304000000005,
       restitution: 1.3,
@@ -230,16 +293,18 @@ function makeRocket1 () {
       // var bursts = [burst1, burst2];
       //
       // randomElement(bursts)(rocket1, 40)
-      switch (Math.floor(Math.random()*2) ) {
+      switch (Math.floor(Math.random()*3) ) {
         case 0:
       burst1(rocket1, 40);
           break;
         case 1:
-        burst2(rocket1, 5)
+        burst2(rocket1, 6)
         break;
+        case 2:
+        burst3(rocket1, 10)
+        break;
+        }
 
-
-      }
 
 
 
@@ -250,6 +315,16 @@ function makeRocket1 () {
   })
 }
 
+// makeRocket1()
+var i = 0;
 window.setInterval(function () {
-  makeRocket1()
-},2000)
+
+  i++;
+  console.log(i);
+
+  window.setTimeout(function () {
+    makeRocket1()
+  },Math.random()*4000*i)
+
+
+},1000)
