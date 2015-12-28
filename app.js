@@ -7,71 +7,201 @@ var Engine = Matter.Engine,
   Events = Matter.Events,
   Vector = Matter.Vector,
   Body = Matter.Body;
-
   var engine = Engine.create(document.body);
 
 engine.render.options.wireframes = false
-engine.render.options.background = 'black';
-var height = $(window).height();
-var width = $(window).width();
-engine.render.canvas.width = width;
-engine.render.canvas.height = height;
+  engine.render.options.background = 'black';
+  var height = $(window).height();
+  var width = $(window).width();
+  engine.render.canvas.width = width;
+  engine.render.canvas.height = height;
   Engine.run(engine);
 
 
-  var world = engine.world;
+var world = engine.world;
   world.bounds.max.y = height;
   world.bounds.max.x = width;
   world.gravity.y = 0.5;
 
+//end
+
+//  makeStars = function (num) {
+//     var StarFactory = function () {
+//
+//       return Bodies.circle(Math.random()*width, Math.random()*height, 2.3,
+//         {  render: {strokeStyle: 'black',
+//                     fillStyle: 'white'},
+//             groupId:1,
+//             isStatic: true,
+//             isSleeping: true
+//         },
+//         1000
+//       )
+//     };
+//     createdStars=[];
+//     for (var i = 0; i < num; i++) {
+//       var star = StarFactory()
+//       createdStars.push(star);
+//
+//       World.add(world, createdStars);
+//
+//     }
+//     return createdStars
+// };
+// makeStars(6)
 
 
-  var SparkFactory = function (firework) {
-    var colors = ['rgb(244, 242, 55)', 'rgb(214, 146, 14)', 'rgb(205, 41, 31)'];
-    var color = colors[Math.floor(Math.random()*colors.length)];
-    return Bodies.circle(firework.position.x, firework.position.y, 2,
-      {  render: {strokeStyle: 'grey',
-                  fillStyle: color},
-      groupId:1,
-    },
-    1000
-    )
-  };
+function randomElement (array) {
+  return array[Math.floor(Math.random()*array.length)];
+}
 
-  var makeSparks = function (firework, num) {
+var colors = ['rgb(255, 0, 245)', 'rgb(0, 221, 228)', 'rgb(189, 255, 0)','rgb(0, 235, 16)','rgb(254, 38, 0)','rgb(255, 153, 0)', 'rgb(0, 18, 255)', 'rgb(166, 0, 255)', 'rgb(0, 255, 194)' ]
+
+var makeSparks = function (firework, num) {
+    var SparkFactory = function (firework) {
+      var fireColors = ['rgb(244, 242, 55)', 'rgb(214, 146, 14)', 'rgb(205, 41, 31)'];
+      var color = randomElement(fireColors)
+      return Bodies.circle(firework.position.x, firework.position.y, 2.3,
+        {  render: {strokeStyle: 'black',
+                    fillStyle: color},
+            groupId:1,
+        },
+        1000
+      )
+    };
     var createdSparks=[];
-
     for (var i = 0; i < num; i++) {
       var spark = SparkFactory(firework)
       createdSparks.push(spark);
-      Matter.Body.applyForce(spark, {x:0,y:0}, {x:.0001*(Math.random()-.5), y:.0001*(Math.random()-.5)})
+      var force =.0001*(Math.random()-.5)
+      Matter.Body.applyForce(spark, {x:0,y:0}, {x:force, y:force})
       World.add(world, spark);
-
-      window.setTimeout(function () {
-        Matter.Composite.remove(world, createdSparks)
-      },300)
-
     }
-
+    window.setTimeout(function () {
+      Matter.Composite.remove(world, createdSparks)
+    },200)
     return createdSparks
-  }
+}
 
+
+function burst1(firework, num) {
+    var SparkFactory = function (firework, color) {
+      var color = color;
+      return Bodies.circle(firework.position.x, firework.position.y, 3,
+        {  render: {strokeStyle: 'black',
+                    fillStyle: color
+                  },
+            groupId:1,
+            timeScale: 0.5
+        },
+        1000
+      )
+    };
+    var createdSparks=[];
+    var color = randomElement(colors)
+    for (var i = 0; i < num; i++) {
+      var spark = SparkFactory(firework, color)
+      createdSparks.push(spark);
+      var forceCoef= .0019;
+      var xForce =forceCoef*(Math.random()-.5)
+      var yForce =forceCoef*(Math.random()-.5)
+      Matter.Body.applyForce(spark, {x:spark.position.x,y:spark.position.y}, {x:xForce, y:yForce})
+      World.add(world, spark);
+    };
+    window.setTimeout(function () {
+      Matter.Composite.remove(world, createdSparks)
+    },2200);
+    return createdSparks
+}
+
+var createdSparkies = [];
+
+function burst2(firework, num) {
+  var SparkFactory = function (firework) {
+    return Bodies.circle(firework.position.x, firework.position.y, 5,
+      {  render: {strokeStyle: 'black',
+                  fillStyle: 'rgb(236, 167, 13)'
+                },
+          groupId:1,
+          mass: 0.047,
+          // gravity: {x:0, y:-.5},
+          timeScale: 0.4
+          // frictionAir: 0.02
+      },
+      1000
+    )
+  };
+
+  function burst21(spark, num) {
+
+    var miniSparkFactory = function (spark) {
+      var color = randomElement(colors)
+      return Bodies.circle(spark.position.x, spark.position.y, 2.5,
+        {  render: {strokeStyle: 'black',
+                    fillStyle: color
+                  },
+            groupId:1,
+            // gravity: {x:0, y:-.5},
+            timeScale: 0.5
+            // frictionAir: 0.02
+        },
+        1000
+      )
+    };
+
+    var createdMiniSparks=[];
+    for (var i = 0; i < num; i++) {
+      var miniSpark = miniSparkFactory(spark)
+      createdMiniSparks.push(miniSpark);
+      var forceCoef= .0039;
+      var xForce =forceCoef*(Math.random()-.5)
+      var yForce =forceCoef*(Math.random()-.5)
+      Matter.Body.applyForce(miniSpark, {x:miniSpark.position.x,y:miniSpark.position.y}, {x:xForce, y:yForce})
+      World.add(world, miniSpark);
+      window.setTimeout(function () {
+        Matter.Composite.remove(world, createdMiniSparks)
+      },1400)
+    }
+  };
+
+  var createdSparkies=[];
+  for (var i = 0; i < num; i++) {
+    var spark = SparkFactory(firework)
+    createdSparkies.push(spark);
+    var forceCoef= .003;
+    var xForce =forceCoef*(Math.random()-.5)
+    var yForce =-0.001+forceCoef*(Math.random()-1)
+    Matter.Body.applyForce(spark, {x:spark.position.x,y:spark.position.y}, {x:xForce, y:yForce})
+    World.add(world, spark);
+
+  }
+  Events.on(engine, "afterTick", function(event) {
+    createdSparkies.forEach(function (sparky) {
+      sparky.render.fillStyle = randomElement(colors)
+    })
+})
+
+  window.setTimeout(function () {
+    createdSparkies.forEach(function (spark) {
+      burst21(spark, 10)
+      Matter.Composite.remove(world, spark);
+    })
+
+  },2200)
+}
 
 
 
 function makeRocket1 () {
-
-
-
-  var rocket1 = Bodies.polygon(width*.8*Math.random(), height, 3, 10,
+  var rocket1 = Bodies.polygon(width*.8*Math.random(), height, 3, 15,
     { timeScale: 1,
       mass:0.047019304000000005,
       restitution: 1.3,
       friction: 0,
       groupId: 1,
       render:{
-        fillStyle: 'rgb(255, 255, 255)',
-        strokeStyle: 'rgb(255, 255, 255)'
+        fillStyle: 'rgb(117, 115, 114)',
+        strokeStyle: 'rgb(0, 0, 0)'
       }
     }, 1000);
 
@@ -82,58 +212,44 @@ function makeRocket1 () {
       y: 0
     }, {
       x: 0.0002*(Math.random()-1),
-      y: -.0025 -.0015*Math.random()
+      y: -.002 -.001*Math.random()
     })
 
   var ID = window.setInterval(function () {
   makeSparks(rocket1, 2)
-  }, 40)
+  }, 60)
+
+
 
   Events.on(engine, "afterTick", function(event) {
+
+
     if (rocket1.velocity.y>0) {
+
+
+      // var bursts = [burst1, burst2];
+      //
+      // randomElement(bursts)(rocket1, 40)
+      switch (Math.floor(Math.random()*2) ) {
+        case 0:
+      burst1(rocket1, 40);
+          break;
+        case 1:
+        burst2(rocket1, 5)
+        break;
+
+
+      }
+
+
+
+      rocket1.velocity.y=-10
         Matter.Composite.remove(world, rocket1);
         window.clearInterval(ID)
     }
   })
-
 }
 
 window.setInterval(function () {
   makeRocket1()
 },2000)
-
-
-
-
-  //   var rocket2Base = Bodies.rectangle( width/2, 0, 30, 10);
-  //   var rocket2Tip = Bodies.polygon( width/2 +200, 0, 3, 60);
-  //   var rocket2 = Body.create(
-  //         {
-  //               parts: [rocket2Tip,rocket2Base],
-  //               position: {x: width/2,
-  //                         y: 0}
-  //           }
-  //
-  //         );
-  //
-  //
-  // World.add(world, [rocket2, rocket2Tip])
-  // console.log(rocket2);
-    // var size = 200;
-    //
-    //
-    //         size = 150;
-    //         x = width/2;
-    //         y = 300;
-    //
-    //         var partC = Bodies.circle(x, y, 30),
-    //             partD = Bodies.circle(x, y, 30),
-    //             partE = Bodies.circle(x, y + size, 30),
-    //             partF = Bodies.circle(x, y + size, 30);
-    //
-    //         var compoundBodyB = Body.create({
-    //             parts: [partC, partD, partE, partF]
-    //         });
-    //
-    //
-    //         World.add(world, [ compoundBodyB]);
