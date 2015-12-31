@@ -10,11 +10,12 @@ var Engine = Matter.Engine,
   var engine = Engine.create(document.body);
 
 engine.render.options.wireframes = false
-  engine.render.options.background = 'black';
+  engine.render.options.background = './image/sky5.jpg';
   var height = $(window).height();
   var width = $(window).width();
   engine.render.canvas.width = width;
   engine.render.canvas.height = height;
+  // engine.enableSleeping = true;
   Engine.run(engine);
 
 
@@ -83,6 +84,35 @@ var makeSparks = function (firework, num) {
     return createdSparks
 }
 
+function sparkLine(firework, num, direction) {
+    var SparkFactory = function (firework, color) {
+      var color = color;
+      return Bodies.circle(firework.position.x, firework.position.y, 3,
+        {  render: {strokeStyle: 'black',
+                    fillStyle: color
+                  },
+            groupId:1,
+            timeScale: 0.5
+        },
+        1000
+      )
+    };
+    var createdSparks=[];
+    var color = randomElement(colors)
+    for (var i = 0; i < num; i++) {
+      var spark = SparkFactory(firework, color)
+      createdSparks.push(spark);
+      var forceCoef= .0019;
+      var xForce =forceCoef*(Math.random()-.5)
+      var yForce =forceCoef*(Math.random()-.5)
+      Matter.Body.applyForce(spark, {x:spark.position.x,y:spark.position.y}, {x:direction*xForce, y:xForce})
+      World.add(world, spark);
+    };
+    window.setTimeout(function () {
+      Matter.Composite.remove(world, createdSparks)
+    },2200);
+    return createdSparks
+}
 
 function burst1(firework, num) {
     var SparkFactory = function (firework, color) {
@@ -113,8 +143,6 @@ function burst1(firework, num) {
     },2200);
     return createdSparks
 }
-
-
 
 function burst2(firework, num) {
   var SparkFactory = function (firework) {
@@ -221,11 +249,12 @@ function burst3(firework, num) {
 
 
   var ID = window.setInterval(function () {
-    var goldBall= Bodies.circle(spark.position.x, spark.position.y, 2.5,
+    var goldBall= Bodies.circle(spark.position.x, spark.position.y, 3,
       {  render: {strokeStyle: 'black',
                   fillStyle: 'rgb(236, 206, 4)'
                 },
           groupId:1,
+          // isSleeping: false,
           isStatic: true,
       },
       1000
@@ -237,22 +266,55 @@ function burst3(firework, num) {
     },4000) // goldball removal
 
 
-  }, 80); // end set interval/ goldball creation
+  }, 100); // end set interval/ goldball creation
 
   window.setTimeout(function () {
     window.clearInterval(ID)
-  }, 5000)
-}) // end for each
+  }, 4000)
+  }) // end for each
 
 
-  window.setTimeout(function () {
-    createdSparkies.forEach(function (spark) {
-      Matter.Composite.remove(world, spark);
-    })
+    window.setTimeout(function () {
+      createdSparkies.forEach(function (spark) {
+        Matter.Composite.remove(world, spark);
+      })
 
-  },5000)
+    },4000)
 
 }
+
+function burst4(firework, num) {
+    var SparkFactory = function (firework, color) {
+      var color = color;
+      return Bodies.circle(firework.position.x, firework.position.y, 3,
+        {  render: {strokeStyle: 'black',
+                    fillStyle: color
+                  },
+            groupId:1,
+            timeScale: 0.5
+        },
+        1000
+      )
+    };
+    var createdSparks=[];
+    var color = randomElement(colors)
+    for (var i = 0; i < num; i++) {
+      var spark = SparkFactory(firework, color)
+      createdSparks.push(spark);
+      var forceCoef= .001;
+
+      var vector = {x: Math.random()-.5, y:Math.random()-.5};
+      vector = Vector.normalise(vector);
+      vector= Vector.mult(vector, forceCoef)
+      Matter.Body.applyForce(spark, {x:spark.position.x,y:spark.position.y}, vector)
+      World.add(world, spark);
+    };
+    window.setTimeout(function () {
+      Matter.Composite.remove(world, createdSparks)
+    },2200);
+    return createdSparks
+}
+
 
 
 function makeRocket1 () {
@@ -275,7 +337,7 @@ function makeRocket1 () {
       y: 0
     }, {
       x: 0.0002*(Math.random()-1),
-      y: -.002 -.001*Math.random()
+      y: -.002 -.0008*Math.random()
     })
 
   var ID = window.setInterval(function () {
@@ -293,15 +355,15 @@ function makeRocket1 () {
       // var bursts = [burst1, burst2];
       //
       // randomElement(bursts)(rocket1, 40)
-      switch (Math.floor(Math.random()*3) ) {
+      switch (randomElement([0,0, 0,1,2]) ) {
         case 0:
-      burst1(rocket1, 40);
-          break;
+        burst1(rocket1, 30);
+        break;
         case 1:
-        burst2(rocket1, 6)
+        burst2(rocket1, 5)
         break;
         case 2:
-        burst3(rocket1, 10)
+        burst3(rocket1, 7)
         break;
         }
 
@@ -315,16 +377,74 @@ function makeRocket1 () {
   })
 }
 
-// makeRocket1()
+function makeRocket2 () {
+  var rocket1 = Bodies.polygon(width*0.1 + width*.8*Math.random(), height, 3, 15,
+    { timeScale: 1,
+      mass:0.047019304000000005,
+      restitution: 1.3,
+      friction: 0,
+      groupId: 1,
+      torque: 1,
+      // timeScale: 0.8,
+      render:{
+        fillStyle: 'rgb(117, 115, 114)',
+        strokeStyle: 'rgb(0, 0, 0)'
+      }
+    }, 1000);
+    console.log(rocket1);
+
+  World.add(world, rocket1)
+
+  Matter.Body.applyForce(rocket1, {
+      x: 0,
+      y: 0
+    }, {
+      x: 0.0002*(Math.random()-1),
+      y: -.002 -.0008*Math.random()
+    })
+    var dir = -1;
+
+    window.setTimeout(function () {
+      sparkLine(rocket1, 20, dir );
+    },100)
+
+
+  var ID = window.setInterval(function () {
+    dir= -1*dir
+  sparkLine(rocket1, 20, dir )
+}, 400)
+
+
+
+  Events.on(engine, "afterTick", function(event) {
+
+
+    if (rocket1.velocity.y>3) {
+
+        burst4(rocket1, 50);
+
+      rocket1.velocity.y=-10
+        Matter.Composite.remove(world, rocket1);
+        window.clearInterval(ID)
+    }
+  })
+}
+
+//makeRocket1()
+makeRocket1()
 var i = 0;
 window.setInterval(function () {
 
   i++;
-  console.log(i);
-
   window.setTimeout(function () {
-    makeRocket1()
+    var choose = Math.random();
+    if (choose<1/6) {
+      makeRocket2()
+    }else{
+      makeRocket1()
+
+    }
   },Math.random()*4000*i)
 
 
-},1000)
+},800)
