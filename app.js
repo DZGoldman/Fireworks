@@ -18,39 +18,10 @@ engine.render.options.wireframes = false
   // engine.enableSleeping = true;
   Engine.run(engine);
 
-
 var world = engine.world;
   world.bounds.max.y = height;
   world.bounds.max.x = width;
   world.gravity.y = 0.5;
-
-//end
-
-//  makeStars = function (num) {
-//     var StarFactory = function () {
-//
-//       return Bodies.circle(Math.random()*width, Math.random()*height, 2.3,
-//         {  render: {strokeStyle: 'black',
-//                     fillStyle: 'white'},
-//             groupId:1,
-//             isStatic: true,
-//             isSleeping: true
-//         },
-//         1000
-//       )
-//     };
-//     createdStars=[];
-//     for (var i = 0; i < num; i++) {
-//       var star = StarFactory()
-//       createdStars.push(star);
-//
-//       World.add(world, createdStars);
-//
-//     }
-//     return createdStars
-// };
-// makeStars(6)
-
 
 function randomElement (array) {
   return array[Math.floor(Math.random()*array.length)];
@@ -152,9 +123,7 @@ function burst2(firework, num) {
                 },
           groupId:1,
           mass: 0.047,
-          // gravity: {x:0, y:-.5},
           timeScale: 0.4
-          // frictionAir: 0.02
       },
       1000
     )
@@ -169,9 +138,7 @@ function burst2(firework, num) {
                     fillStyle: color
                   },
             groupId:1,
-            // gravity: {x:0, y:-.5},
             timeScale: 0.5
-            // frictionAir: 0.02
         },
         1000
       )
@@ -186,10 +153,11 @@ function burst2(firework, num) {
       var yForce =forceCoef*(Math.random()-.5)
       Matter.Body.applyForce(miniSpark, {x:miniSpark.position.x,y:miniSpark.position.y}, {x:xForce, y:yForce})
       World.add(world, miniSpark);
-      window.setTimeout(function () {
-        Matter.Composite.remove(world, createdMiniSparks)
-      },1400)
+
     }
+    window.setTimeout(function () {
+      Matter.Composite.remove(world, createdMiniSparks)
+    },1400)
   };
 
     var createdSparkies=[];
@@ -344,17 +312,10 @@ function makeRocket1 () {
   makeSparks(rocket1, 2)
   }, 60)
 
-
-
   Events.on(engine, "afterTick", function(event) {
-
 
     if (rocket1.velocity.y>0) {
 
-
-      // var bursts = [burst1, burst2];
-      //
-      // randomElement(bursts)(rocket1, 40)
       switch (randomElement([0,0, 0,1,2]) ) {
         case 0:
         burst1(rocket1, 30);
@@ -366,9 +327,6 @@ function makeRocket1 () {
         burst3(rocket1, 7)
         break;
         }
-
-
-
 
       rocket1.velocity.y=-10
         Matter.Composite.remove(world, rocket1);
@@ -414,10 +372,7 @@ function makeRocket2 () {
   sparkLine(rocket1, 20, dir )
 }, 400)
 
-
-
   Events.on(engine, "afterTick", function(event) {
-
 
     if (rocket1.velocity.y>3) {
 
@@ -430,7 +385,6 @@ function makeRocket2 () {
   })
 }
 
-//makeRocket1()
 makeRocket1()
 var i = 0;
 window.setInterval(function () {
@@ -442,9 +396,6 @@ window.setInterval(function () {
       makeRocket2()
     }else{
       makeRocket1()
-
     }
   },Math.random()*4000*i)
-
-
 },800)
