@@ -316,7 +316,7 @@ function makeRocket1 () {
 
     if (rocket1.velocity.y>0) {
 
-      switch (randomElement([0,0, 0,1,2]) ) {
+      switch (randomElement([0, 0,1,2]) ) {
         case 0:
         burst1(rocket1, 30);
         break;
@@ -324,7 +324,7 @@ function makeRocket1 () {
         burst2(rocket1, 5)
         break;
         case 2:
-        burst3(rocket1, 7)
+        burst3(rocket1, 5)
         break;
         }
 
@@ -392,7 +392,7 @@ window.setInterval(function () {
   i++;
   window.setTimeout(function () {
     var choose = Math.random();
-    if (choose<1/6) {
+    if (choose<1/5) {
       makeRocket2()
     }else{
       makeRocket1()
