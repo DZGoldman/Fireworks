@@ -1,4 +1,4 @@
-console.log('Hello, Dave.');
+
 
 var Engine = Matter.Engine,
   World = Matter.World,
