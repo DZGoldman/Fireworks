@@ -285,8 +285,11 @@ function burst4(firework, num) {
 
 
 
-function makeRocket1 () {
-  var rocket1 = Bodies.polygon(width*0.1 + width*.8*Math.random(), height, 3, 15,
+function makeRocket1 (xPos) {
+  if(!xPos){
+    xPos = width*0.1 + width*.8*Math.random()
+  }
+  var rocket1 = Bodies.polygon(xPos, height, 3, 15,
     { timeScale: 1,
       mass:0.047019304000000005,
       restitution: 1.3,
@@ -335,8 +338,11 @@ function makeRocket1 () {
   })
 }
 
-function makeRocket2 () {
-  var rocket1 = Bodies.polygon(width*0.1 + width*.8*Math.random(), height, 3, 15,
+function makeRocket2 (xPos) {
+  if(!xPos){
+    xPos = width*0.1 + width*.8*Math.random()
+  }
+  var rocket1 = Bodies.polygon(xPos, height, 3, 15,
     { timeScale: 1,
       mass:0.047019304000000005,
       restitution: 1.3,
@@ -398,4 +404,13 @@ window.setInterval(function () {
       makeRocket1()
     }
   },Math.random()*4000*i)
-},800)
+},3000)
+
+window.onload = (e) => {  
+  console.log("\x1b[31m%s\x1b[0m", ' sis boom bah')
+  window.addEventListener('click',(e)=>{
+    const position = e.pageX
+    const makeRocket = Math.random() > 0.2 ? makeRocket1 : makeRocket2
+    makeRocket(position)
+  })
+}
